@@ -27,7 +27,9 @@ html,body{margin:0;background:var(--bg);color:var(--text);
 body{min-height:100dvh;touch-action:manipulation;-webkit-user-select:none;user-select:none;overscroll-behavior:none;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 button{font-family:inherit;color:inherit;cursor:pointer}
-.app{max-width:640px;margin:0 auto;padding:12px 16px 20px;display:flex;flex-direction:column;gap:12px}
+.app{max-width:640px;margin:0 auto;padding:12px 16px 14px;display:flex;flex-direction:column;gap:12px;
+  min-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+.stage{flex:1;display:flex;align-items:center;justify-content:center;min-height:260px;position:relative}
 
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:4px}
 .brand h1{margin:0;font-size:26px;font-weight:900;letter-spacing:-.3px}
@@ -56,7 +58,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 .banner.show{display:block}
 
 .boardWrap{position:relative;align-self:center;aspect-ratio:1;
-  width:min(100%,600px,max(280px,calc(100dvh - 330px - env(safe-area-inset-top) - env(safe-area-inset-bottom))))}
+  width:min(100%,600px,max(260px,calc(100dvh - 380px - env(safe-area-inset-top) - env(safe-area-inset-bottom))))}
 .board{position:absolute;inset:0;background-color:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;
   touch-action:none;cursor:crosshair;--n:5;
   background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),linear-gradient(to bottom,var(--line) 1px,transparent 1px);
@@ -78,10 +80,11 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
   font-size:15px;padding:5px 11px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.5);font-variant-numeric:tabular-nums}
 .dim.ok{background:var(--mint);color:#04160F}
 
-.controls{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.ctl{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:9px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px}
-.ctl svg{width:21px;height:21px}
-.ctl span{font-size:11.5px;font-weight:700;color:var(--muted)}
+.controls{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding-top:4px}
+.ctl{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:16px 2px 13px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .08s}
+.ctl svg{width:27px;height:27px}
+.ctl span{font-size:13px;font-weight:700;color:var(--muted)}
+.ctl:active{transform:scale(.95)}
 .ctl:active{background:var(--panel2)}
 .ctl:disabled{opacity:.35}
 .ctl.primary{border-color:rgba(60,199,154,.45)}
@@ -136,6 +139,7 @@ td:first-child{font-weight:700;color:#C4C8CE}
   </div>
 
   <div class="banner" id="banner"></div>
+  <div class="stage" id="stage">
 
   <div class="boardWrap" id="wrap">
     <div class="board" id="board">
@@ -144,6 +148,7 @@ td:first-child{font-weight:700;color:#C4C8CE}
       <div class="layer" style="z-index:3"><div class="preview" id="preview"></div></div>
     </div>
     <div class="dim" id="dim"></div>
+  </div>
   </div>
 
   <div class="controls">
@@ -353,6 +358,9 @@ function boxStyle(r,c,w,h,N,inset){
 }
 function sizeCells(){if(G)board.style.setProperty('--cell',(board.clientWidth/G.puzzle.size)+'px')}
 new ResizeObserver(sizeCells).observe(board);
+const stage=$('stage');
+function fitBoard(){const w=stage.clientWidth,h=stage.clientHeight;if(w&&h)wrap.style.width=Math.floor(Math.min(w,h,600))+'px'}
+new ResizeObserver(fitBoard).observe(stage);
 
 function buildBoard(){
   const N=G.puzzle.size;
