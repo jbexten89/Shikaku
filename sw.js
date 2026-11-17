@@ -1,7 +1,7 @@
 // Shikaku offline support: keeps the app working with no connection.
 // Page: network first (so updates arrive), falls back to the saved copy.
 // Icons, fonts and other files: served from the saved copy, refreshed in the background.
-const CACHE='shikaku-v2';
+const CACHE='shikaku-v3';
 const CORE=['./','./index.html','./manifest.json','./icons/apple-touch-icon.png','./icons/favicon-32.png','./icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png'];
 
 self.addEventListener('install',e=>{
