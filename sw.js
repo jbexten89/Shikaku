@@ -1,7 +1,7 @@
 // Shikaku offline support: keeps the app working with no connection.
 // Page: network first (so updates arrive), falls back to the saved copy.
 // Icons, fonts and other files: served from the saved copy, refreshed in the background.
-const CACHE='shikaku-v5';
+const CACHE='shikaku-v6';
 const CORE=['./','./index.html','./manifest.json','./icons/apple-touch-icon.png','./icons/favicon-32.png','./icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png'];
 
 self.addEventListener('install',e=>{
@@ -21,7 +21,7 @@ self.addEventListener('fetch',e=>{
     e.respondWith((async()=>{
       const cache=await caches.open(CACHE);
       try{
-        const res=await Promise.race([fetch(req),timeout(3000)]);
+        const res=await Promise.race([fetch(req,{cache:'no-cache'}),timeout(4000)]);
         if(res&&res.ok)cache.put('./index.html',res.clone());
         return res;
       }catch(err){
@@ -36,7 +36,7 @@ self.addEventListener('fetch',e=>{
   e.respondWith((async()=>{
     const cache=await caches.open(CACHE);
     const hit=await cache.match(req);
-    const net=fetch(req).then(res=>{if(res&&(res.ok||res.type==='opaque'))cache.put(req,res.clone());return res}).catch(()=>null);
+    const net=fetch(req,isFont?{}:{cache:'no-cache'}).then(res=>{if(res&&(res.ok||res.type==='opaque'))cache.put(req,res.clone());return res}).catch(()=>null);
     if(hit){e.waitUntil(net);return hit}
     return (await net)||Response.error();
   })());
