@@ -68,10 +68,10 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 .rect{transition:opacity .12s}
 .rect.doomed{opacity:.28}
 .layer{position:absolute;inset:0;pointer-events:none}
-.rect{position:absolute;border-radius:var(--rad);background:hsl(var(--h) 50% 71%);
+.rect{position:absolute;border-radius:var(--rad);background:var(--bg);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -2px 0 rgba(0,0,0,.08),0 3px 10px rgba(0,0,0,.35)}
-.rect.bad{background:hsl(var(--h) 14% 27%);box-shadow:inset 0 0 0 2.5px var(--amber)}
-.rect.hint::after{content:'';position:absolute;top:calc(var(--cell)*.12);right:calc(var(--cell)*.12);width:calc(var(--cell)*.13);height:calc(var(--cell)*.13);border-radius:50%;background:hsl(var(--h) 45% 24%);opacity:.55}
+.rect.bad{background:#2A2D33;box-shadow:inset 0 0 0 2.5px var(--amber)}
+.rect.hint::after{content:'';position:absolute;top:calc(var(--cell)*.12);right:calc(var(--cell)*.12);width:calc(var(--cell)*.13);height:calc(var(--cell)*.13);border-radius:50%;background:var(--fg);opacity:.45}
 .rect.pop{animation:snap .28s cubic-bezier(.3,1.7,.5,1)}
 @keyframes snap{from{transform:scale(.9)}to{transform:scale(1)}}
 .rect.wave{animation:wave .55s ease-out both;animation-delay:var(--d)}
@@ -122,6 +122,12 @@ td{padding:9px 4px;border-top:1px solid var(--border);text-align:right;font-weig
 td:first-child{font-weight:700;color:#C4C8CE}
 .spinner{width:42px;height:42px;border-radius:50%;border:4px solid var(--border2);border-top-color:var(--mint);animation:spin .8s linear infinite;margin:6px auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.palopt{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-top:10px;text-align:left}
+.palopt b{font-size:16px;font-weight:800;display:block}
+.palopt small{font-size:12.5px;color:var(--muted);font-weight:600}
+.palopt.on{border-color:var(--mint);box-shadow:0 0 0 1px var(--mint)}
+.sw{display:flex;gap:4px;flex-shrink:0}
+.sw i{width:17px;height:17px;border-radius:5px;display:block}
 .ex{display:block;margin:10px auto 4px;width:150px;height:150px}
 </style>
 </head>
@@ -130,6 +136,7 @@ td:first-child{font-weight:700;color:#C4C8CE}
   <header>
     <div class="brand"><h1>Shikaku<span>.</span></h1><div class="sub" id="sub">Divide the grid into rectangles</div></div>
     <div class="iconbtns">
+      <button class="iconbtn" id="palBtn" aria-label="Colors"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.8-.8 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor"/><circle cx="10.5" cy="7" r="1.2" fill="currentColor"/><circle cx="15" cy="7.5" r="1.2" fill="currentColor"/></svg></button>
       <button class="iconbtn" id="statsBtn" aria-label="Stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 20V12M12 20V5M19 20v-6"/></svg></button>
       <button class="iconbtn" id="helpBtn" aria-label="How to play">?</button>
     </div>
@@ -289,7 +296,15 @@ let stats=store.get(K_STATS,{})||{};
 let mode=store.get(K_MODE,'easy');if(!MODES[mode])mode='easy';
 
 /* ---------- state ---------- */
-const HUES=[160,212,268,32,96,338,188,52,290,128,8,236];
+const PALETTES={
+  pastel:[['#8FD8C0','#0F3B2E'],['#9DC4F2','#13304F'],['#C9ADF3','#33215A'],['#F6C394','#4A2A0E'],['#F3A6BC','#4E1A2B'],['#ECDB8C','#3F3510'],['#AEDF92','#1F3D12'],['#90D6E4','#103A44'],['#E7B0E8','#43204A'],['#B8BEF5','#22285A']],
+  jewel:[['#2FA383','#FFFFFF'],['#3F7FD0','#FFFFFF'],['#8B5FD4','#FFFFFF'],['#D97A3A','#FFFFFF'],['#CC4A6E','#FFFFFF'],['#C2A132','#1E1704'],['#4CA65C','#FFFFFF'],['#2E9DB3','#FFFFFF'],['#B04FB5','#FFFFFF'],['#5763C9','#FFFFFF']],
+  ocean:[['#3CC79A','#06281D'],['#2E9FA6','#04252A'],['#3C86B8','#FFFFFF'],['#5470C0','#FFFFFF'],['#6E64C2','#FFFFFF'],['#2F8F6E','#FFFFFF'],['#7FD6B9','#0B3328'],['#78B9DE','#0C2C40'],['#9DA6E6','#1B2050'],['#4FB7C0','#06303A']]
+};
+const K_PAL='shikaku.v1.palette';
+let PAL=PALETTES[store.get(K_PAL,'pastel')]||PALETTES.pastel;
+const hueOf=hex=>{const n=parseInt(hex.slice(1),16),r=(n>>16&255)/255,g=(n>>8&255)/255,b=(n&255)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;
+  if(!d)return 0;let h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;return (h*60+360)%360};
 let G=null,A=null,undoStack=[],redoStack=[],runStart=null,drag=null,popKey=null,busy=false;
 
 const $=id=>document.getElementById(id);
@@ -403,13 +418,13 @@ function render(){
   rectLayer.innerHTML=G.rects.map((q,i)=>{
     const k=`${q.r},${q.c},${q.w},${q.h}`;
     const cls=['rect',valid[i]?'':'bad',q.hint?'hint':'',k===popKey?'pop':''].join(' ');
-    return `<div class="${cls}" style="--h:${HUES[q.col%HUES.length]};${boxStyle(q.r,q.c,q.w,q.h,N,2)}"></div>`;
+    return `<div class="${cls}" style="--bg:${PAL[q.col%PAL.length][0]};--fg:${PAL[q.col%PAL.length][1]};${boxStyle(q.r,q.c,q.w,q.h,N,2)}"></div>`;
   }).join('');
   popKey=null;
   G.puzzle.clues.forEach((k,i)=>{
     const o=owner[k.r*N+k.c],el=$('clue'+i);
     el.className='clue'+(o<0?'':valid[o]?' done':' bad');
-    el.style.color=o>=0&&valid[o]?`hsl(${HUES[G.rects[o].col%HUES.length]} 42% 19%)`:'';
+    el.style.color=o>=0&&valid[o]?PAL[G.rects[o].col%PAL.length][1]:'';
   });
   $('prog').textContent=Math.floor(covered/(N*N)*100)+'%';
   $('prog').className='v'+(G.solved?' mint':'');
@@ -433,13 +448,13 @@ function commit(){undoStack.push(snap());if(undoStack.length>300)undoStack.shift
 
 function pickColor(q){
   const{N,owner}=A,near=new Set();
-  const look=(r,c)=>{if(r<0||c<0||r>=N||c>=N)return;const o=owner[r*N+c];if(o>=0&&!overlaps(G.rects[o],q))near.add(G.rects[o].col%HUES.length)};
+  const look=(r,c)=>{if(r<0||c<0||r>=N||c>=N)return;const o=owner[r*N+c];if(o>=0&&!overlaps(G.rects[o],q))near.add(G.rects[o].col%PAL.length)};
   for(let i=0;i<q.w;i++){look(q.r-1,q.c+i);look(q.r+q.h,q.c+i)}
   for(let i=0;i<q.h;i++){look(q.r+i,q.c-1);look(q.r+i,q.c+q.w)}
-  const hd=(a,b)=>{const d=Math.abs(HUES[a]-HUES[b])%360;return Math.min(d,360-d)};
-  let best=G.colorSeq%HUES.length,bestD=-1;
-  for(let t=0;t<HUES.length;t++){
-    const c=(G.colorSeq+t)%HUES.length;let m=360;
+  const hd=(a,b)=>{const d=Math.abs(hueOf(PAL[a][0])-hueOf(PAL[b][0]))%360;return Math.min(d,360-d)};
+  let best=G.colorSeq%PAL.length,bestD=-1;
+  for(let t=0;t<PAL.length;t++){
+    const c=(G.colorSeq+t)%PAL.length;let m=360;
     for(const n of near)m=Math.min(m,hd(c,n));
     if(m>=40){best=c;break}
     if(m>bestD){bestD=m;best=c}
@@ -627,6 +642,19 @@ function showHelp(){
 }
 $('helpBtn').onclick=showHelp;
 $('statsBtn').onclick=showStats;
+const PAL_INFO={pastel:['Pastel','Soft and light'],jewel:['Jewel','Rich and bold'],ocean:['Ocean','Mints, teals and blues']};
+function showColors(){
+  const cur=store.get(K_PAL,'pastel');
+  showModal(`<h2>Board colors</h2><p class="muted" style="margin:0">Changes apply right away, even mid-puzzle.</p>
+    ${Object.keys(PALETTES).map(k=>`<button class="palopt${k===cur?' on':''}" data-pal="${k}"><span><b>${PAL_INFO[k][0]}</b><small>${PAL_INFO[k][1]}</small></span>
+      <span class="sw">${PALETTES[k].slice(0,6).map(c=>`<i style="background:${c[0]}"></i>`).join('')}</span></button>`).join('')}
+    <div class="btnrow"><button class="btn mint" data-close>Done</button></div>`);
+  document.querySelectorAll('.palopt').forEach(b=>b.onclick=()=>{
+    store.set(K_PAL,b.dataset.pal);PAL=PALETTES[b.dataset.pal];if(G)render();
+    document.querySelectorAll('.palopt').forEach(x=>x.classList.toggle('on',x===b));
+  });
+}
+$('palBtn').onclick=showColors;
 
 /* ---------- modal ---------- */
 let modalLock=false;
