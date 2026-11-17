@@ -51,6 +51,27 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 .stats{display:flex;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:8px 0}
 .stat{flex:1;text-align:center;border-left:1px solid var(--border)}
 .stat:first-child{border-left:0}
+.timebtn{background:none;border:0;border-radius:0;padding:0;font:inherit;color:inherit}
+.timebtn .pz{width:10px;height:10px;vertical-align:-1px;margin-left:3px;opacity:.85;color:var(--mint)}
+.timebtn:active .v{opacity:.6}
+.pauseOv{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--bg);z-index:8}
+.pauseOv .pk{font-size:13px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);font-weight:700}
+.pauseOv .pt{font-size:48px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:14px}
+.pauseOv .btn{flex:none;min-width:180px}
+body.paused .pauseOv{display:flex}
+body.paused .boardWrap{visibility:hidden}
+body.paused .controls .ctl:not(#newBtn){opacity:.35;pointer-events:none}
+.tile.lit.neu{background:#2C3341}
+.preview.neu{box-shadow:inset 0 0 0 2px #A3ABB8}
+.dim.neu{background:#C9CED6;color:#0B0D10}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-top:10px;width:100%;text-align:left}
+.setrow b{font-size:16px;font-weight:800;display:block}
+.setrow small{font-size:12.5px;color:var(--muted);font-weight:600;line-height:1.35;display:block}
+.tog{flex-shrink:0;width:50px;height:30px;border-radius:999px;background:#2E333B;position:relative;transition:background .15s}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#E6E8EB;transition:transform .15s}
+.tog.on{background:var(--mint)}
+.tog.on::after{transform:translateX(20px)}
+.sechd{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);font-weight:700;margin:16px 0 -2px}
 .stat .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);font-weight:700}
 .stat .v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
 .stat .v.mint{color:var(--mint)}
@@ -84,6 +105,13 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 .dim{position:absolute;z-index:5;pointer-events:none;display:none;background:var(--amber);color:#1A1205;font-weight:900;
   font-size:15px;padding:5px 11px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.5);font-variant-numeric:tabular-nums}
 .dim.ok{background:var(--mint);color:#04160F}
+.loupe{position:absolute;z-index:9;width:128px;height:128px;border-radius:50%;overflow:hidden;pointer-events:none;display:none;
+  background:var(--bg);box-shadow:0 0 0 2px #3A404A,0 10px 28px rgba(0,0,0,.6)}
+.loupe .board{cursor:default}
+.loupe .lc{position:absolute;border-radius:6px;box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(0,0,0,.45)}
+.loupe .lbl{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);background:var(--amber);color:#1A1205;font-weight:800;font-size:12px;padding:2px 8px;border-radius:999px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.loupe .lbl.ok{background:var(--mint);color:#04160F}
+.loupe .lbl.neu{background:#C9CED6;color:#0B0D10}
 
 .controls{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding-top:4px}
 .ctl{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:16px 2px 13px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .08s}
@@ -136,7 +164,7 @@ td:first-child{font-weight:700;color:#C4C8CE}
   <header>
     <div class="brand"><h1>Shikaku<span>.</span></h1><div class="sub" id="sub">Divide the grid into rectangles</div></div>
     <div class="iconbtns">
-      <button class="iconbtn" id="palBtn" aria-label="Colors"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.8-.8 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor"/><circle cx="10.5" cy="7" r="1.2" fill="currentColor"/><circle cx="15" cy="7.5" r="1.2" fill="currentColor"/></svg></button>
+      <button class="iconbtn" id="palBtn" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
       <button class="iconbtn" id="statsBtn" aria-label="Stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 20V12M12 20V5M19 20v-6"/></svg></button>
       <button class="iconbtn" id="helpBtn" aria-label="How to play">?</button>
     </div>
@@ -145,7 +173,7 @@ td:first-child{font-weight:700;color:#C4C8CE}
   <div class="modes" id="modes"></div>
 
   <div class="stats">
-    <div class="stat"><div class="k">Time</div><div class="v" id="time">0:00</div></div>
+    <button class="stat timebtn" id="timeBtn" aria-label="Pause"><div class="k">Time <svg class="pz" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg></div><div class="v" id="time">0:00</div></button>
     <div class="stat"><div class="k">Filled</div><div class="v" id="prog">0%</div></div>
     <div class="stat"><div class="k">Hints</div><div class="v" id="hints">0</div></div>
   </div>
@@ -161,7 +189,9 @@ td:first-child{font-weight:700;color:#C4C8CE}
       <div class="layer" id="clueLayer" style="z-index:3"></div>
     </div>
     <div class="dim" id="dim"></div>
+    <div class="loupe" id="loupe"><div id="loupeIn"></div><div class="lc" id="loupeC"></div><div class="lbl" id="loupeL"></div></div>
   </div>
+  <div class="pauseOv" id="pauseOv"><div class="pk">Paused</div><div class="pt" id="pauseTime">0:00</div><button class="btn mint" id="resumeBtn">Resume</button></div>
   </div>
 
   <div class="controls">
@@ -283,6 +313,77 @@ function generate(mode,rng){
   }
   return null;
 }
+// Human-style solver. Returns {solved, maxLevel, counts}
+// L1: clue has a single fitting rectangle / cell reachable by single rectangle
+// L2: overlap — cells shared by all of a clue's rectangles are claimed (removes others)
+// L3: contradiction — trying a rectangle leads to an immediate L1/L2 dead end
+function rate(N,clues,maxL){
+  maxL=maxL||3;
+  const {cands,cellC}=buildCands(N,clues);
+  const C=cands.length;
+  function run(alive,cov,placed,level){ // mutates; returns {ok, stuck, counts}
+    const counts=[0,0,0,0];
+    const kill=cid=>{alive[cid]=0};
+    const place=cid=>{const k=cands[cid];placed[k.clue]=1;
+      for(const id of k.cells){cov[id]=1;for(const o of cellC[id])if(o!==cid)alive[o]=0}
+      for(let o=0;o<C;o++)if(alive[o]&&cands[o].clue===k.clue&&o!==cid)alive[o]=0;};
+    for(;;){
+      let prog=false;
+      // L1a clue single
+      const byClue=clues.map(()=>[]);
+      for(let i=0;i<C;i++)if(alive[i]&&!placed[cands[i].clue])byClue[cands[i].clue].push(i);
+      for(let ci=0;ci<clues.length;ci++){if(placed[ci])continue;
+        if(byClue[ci].length===0)return{ok:false};
+        if(byClue[ci].length===1){place(byClue[ci][0]);counts[1]++;prog=true}}
+      if(prog)continue;
+      // L1b cell single
+      for(let id=0;id<N*N;id++){if(cov[id])continue;let n=0,last=-1;
+        for(const o of cellC[id])if(alive[o]){n++;last=o;if(n>1)break}
+        if(n===0)return{ok:false};
+        if(n===1){place(last);counts[1]++;prog=true;break}}
+      if(prog)continue;
+      if(placed.every(x=>x))return{ok:true,done:true,counts};
+      if(level<2)return{ok:true,done:false,counts};
+      // L2 overlap
+      for(let ci=0;ci<clues.length;ci++){if(placed[ci])continue;
+        const cnt=new Map();for(const o of byClue[ci])for(const id of cands[o].cells)cnt.set(id,(cnt.get(id)||0)+1);
+        for(const [id,v] of cnt)if(v===byClue[ci].length)for(const o of cellC[id])if(alive[o]&&cands[o].clue!==ci){alive[o]=0;prog=true}
+        if(prog){counts[2]++;break}}
+      if(prog)continue;
+      if(level<3)return{ok:true,done:false,counts};
+      // L3 contradiction: try each alive cand of most constrained clues
+      let found=false;
+      const order=[...Array(clues.length).keys()].filter(c=>!placed[c]).sort((a,b)=>byClue[a].length-byClue[b].length);
+      outer:for(const ci of order)for(const o of byClue[ci]){
+        const a2=alive.slice(),c2=cov.slice(),p2=placed.slice();
+        const k=cands[o];p2[k.clue]=1;for(const id of k.cells){c2[id]=1;for(const x of cellC[id])if(x!==o)a2[x]=0}
+        for(const x of byClue[ci])if(x!==o)a2[x]=0;
+        const r=run(a2,c2,p2,2);
+        if(!r.ok){alive[o]=0;counts[3]++;found=true;break outer}
+      }
+      if(found)continue;
+      return{ok:true,done:false,counts};
+    }
+  }
+  const alive=new Uint8Array(C).fill(1),cov=new Uint8Array(N*N),placed=new Array(clues.length).fill(0);
+  const r=run(alive,cov,placed,maxL);
+  const lvl=!r.done?4:r.counts[3]?3:r.counts[2]?2:1;
+  return{level:lvl,counts:r.counts};
+}
+const TARGET={easy:s=>s.level===1,medium:s=>s.level===2,hard:s=>s.level===3||(s.level===2&&s.counts[2]>=4),
+  expert:s=>s.level===3&&s.counts[3]>=2,daily:s=>s.level>=2};
+const scoreOf=s=>s.level*100+s.counts[2]*2+s.counts[3]*10;
+function generateRated(mode,rng){
+  let best=null,bestS=-1;
+  for(let t=0;t<600;t++){
+    const p=generate(mode,rng);if(!p)continue;
+    const r=rate(p.size,p.clues);p.rating={level:r.level,counts:r.counts};
+    if(TARGET[mode](r))return p;
+    const sc=mode==='easy'?-scoreOf(r):scoreOf(r);
+    if(sc>bestS){bestS=sc;best=p}
+  }
+  return best;
+}
 // ===== GEN-END =====
 
 /* ---------- storage ---------- */
@@ -323,7 +424,15 @@ function fmtTime(ms){
   return h?`${h}:${pad(m)}:${pad(ss)}`:`${m}:${pad(ss)}`;
 }
 const elapsedNow=()=>G?G.elapsed+(runStart!=null?Date.now()-runStart:0):0;
-function startTimer(){if(G&&!G.solved&&runStart==null&&!document.hidden)runStart=Date.now()}
+let paused=false;
+const K_MIST='shikaku.v1.showMistakes';
+let showMist=store.get(K_MIST,true)!==false;
+function startTimer(){if(G&&!G.solved&&!paused&&runStart==null&&!document.hidden)runStart=Date.now()}
+function setPaused(v){
+  if(v&&(!G||G.solved||busy))return;
+  paused=v;document.body.classList.toggle('paused',v);
+  if(v){pauseTimer();saveGame();$('pauseTime').textContent=fmtTime(G.elapsed)}else startTimer();
+}
 function pauseTimer(){if(G&&runStart!=null){G.elapsed+=Date.now()-runStart}runStart=null}
 setInterval(()=>{$('time').textContent=fmtTime(G&&G.solved?G.solvedTime:elapsedNow())},250);
 
@@ -347,6 +456,7 @@ $('modes').addEventListener('click',e=>{
 
 function loadMode(m){
   pauseTimer();saveGame();
+  if(paused){paused=false;document.body.classList.remove('paused')}
   mode=m;store.set(K_MODE,mode);renderModes();
   let g=games[m];
   if(g&&m==='daily'&&g.dateKey!==todayKey())g=null;
@@ -358,12 +468,13 @@ function loadMode(m){
 /* ---------- generation ---------- */
 function newGame(){
   if(busy)return;busy=true;pauseTimer();
+  if(paused){paused=false;document.body.classList.remove('paused')}
   showModal(`<div style="text-align:center;padding:10px 0"><div class="spinner"></div>
     <h2 style="font-size:19px">Building a puzzle</h2><p class="muted" style="margin:4px 0 0">Checking it has exactly one solution…</p></div>`,{lock:true});
   setTimeout(()=>{
     const key=todayKey();
     const rng=mode==='daily'?mulberry32(hashStr('shikaku-daily-'+key)):mulberry32((Math.random()*4294967296)>>>0);
-    const puzzle=generate(mode,rng);
+    const puzzle=generateRated(mode,rng);
     G={mode,dateKey:mode==='daily'?key:null,puzzle,rects:[],elapsed:0,hints:0,solved:false,solvedTime:0,colorSeq:0};
     undoStack=[];redoStack=[];
     buildBoard();render();saveGame();
@@ -417,21 +528,21 @@ function render(){
   A=analyze();const{N,owner,valid,covered}=A;
   rectLayer.innerHTML=G.rects.map((q,i)=>{
     const k=`${q.r},${q.c},${q.w},${q.h}`;
-    const cls=['rect',valid[i]?'':'bad',q.hint?'hint':'',k===popKey?'pop':''].join(' ');
+    const cls=['rect',valid[i]||!showMist?'':'bad',q.hint?'hint':'',k===popKey?'pop':''].join(' ');
     return `<div class="${cls}" style="--bg:${PAL[q.col%PAL.length][0]};--fg:${PAL[q.col%PAL.length][1]};${boxStyle(q.r,q.c,q.w,q.h,N,2)}"></div>`;
   }).join('');
   popKey=null;
   G.puzzle.clues.forEach((k,i)=>{
     const o=owner[k.r*N+k.c],el=$('clue'+i);
-    el.className='clue'+(o<0?'':valid[o]?' done':' bad');
-    el.style.color=o>=0&&valid[o]?PAL[G.rects[o].col%PAL.length][1]:'';
+    el.className='clue'+(o<0?'':valid[o]||!showMist?' done':' bad');
+    el.style.color=o>=0&&(valid[o]||!showMist)?PAL[G.rects[o].col%PAL.length][1]:'';
   });
   $('prog').textContent=Math.floor(covered/(N*N)*100)+'%';
   $('prog').className='v'+(G.solved?' mint':'');
   $('hints').textContent=G.hints;
   const bad=valid.filter(v=>!v).length,banner=$('banner');
   if(!G.solved&&covered===N*N&&bad){
-    banner.textContent=`The grid is full, but ${bad} rectangle${bad>1?'s aren’t':' isn’t'} right yet.`;banner.classList.add('show');
+    banner.textContent=showMist?`The grid is full, but ${bad} rectangle${bad>1?'s aren’t':' isn’t'} right yet.`:'The grid is full, but something isn’t right yet.';banner.classList.add('show');
   }else banner.classList.remove('show');
   board.classList.toggle('solved',G.solved);
   $('undoBtn').disabled=G.solved||!undoStack.length;
@@ -503,10 +614,18 @@ $('newBtn').onclick=()=>{
 };
 
 /* ---------- pointer input ---------- */
-function cellAt(e){
+function cellAt(e,prev){
   const b=board.getBoundingClientRect(),N=G.puzzle.size;
-  const x=(e.clientX-b.left-1)/(b.width-2),y=(e.clientY-b.top-1)/(b.height-2);
-  return{r:Math.min(N-1,Math.max(0,Math.floor(y*N))),c:Math.min(N-1,Math.max(0,Math.floor(x*N)))};
+  const fx=(e.clientX-b.left)/b.width*N,fy=(e.clientY-b.top)/b.height*N;
+  const clamp=v=>Math.min(N-1,Math.max(0,Math.floor(v)));
+  let r=clamp(fy),c=clamp(fx);
+  // stickiness: near the edge between two neighboring squares, keep the current one
+  const STICK=N>=10?.28:.18;
+  if(prev){
+    if(Math.abs(c-prev.c)===1&&Math.abs(fx-Math.max(c,prev.c))<STICK)c=prev.c;
+    if(Math.abs(r-prev.r)===1&&Math.abs(fy-Math.max(r,prev.r))<STICK)r=prev.r;
+  }
+  return{r,c};
 }
 function dragRect(){
   const s=drag.s,e=drag.cur;
@@ -518,23 +637,43 @@ function showPreview(){
   for(let a=0;a<q.h;a++)for(let b=0;b<q.w;b++){const ci=A.clueAt[(q.r+a)*N+q.c+b];if(ci>=0){cnt++;n=G.puzzle.clues[ci].n}}
   const ok=cnt===1&&n===area;
   preview.style.cssText=boxStyle(q.r,q.c,q.w,q.h,N,2)+';display:block';
-  preview.className='preview'+(ok?' ok':'');
-  lightTiles(q,ok);
-  dim.textContent=`${q.w}×${q.h} = ${area}`;dim.className='dim'+(ok?' ok':'');dim.style.display='block';
+  const cl=showMist?(ok?' ok':''):' neu';
+  preview.className='preview'+cl;
+  lightTiles(q,cl);
+  dim.textContent=`${q.w}×${q.h} = ${area}`;dim.className='dim'+cl;dim.style.display='block';
   const W=wrap.clientWidth,cs=W/N,dw=dim.offsetWidth,dh=dim.offsetHeight;
   let top=q.r*cs-dh-8;if(top<-dh-4)top=(q.r+q.h)*cs+8;
   if(top<0&&q.r*cs<dh+8)top=Math.max(-dh-10,q.r*cs-dh-8);
   let left=(q.c+q.w/2)*cs-dw/2;left=Math.max(0,Math.min(W-dw,left));
   dim.style.left=left+'px';dim.style.top=top+'px';
+  updateLoupe(cl,`${q.w}×${q.h} = ${area}`);
+}
+const loupe=$('loupe'),loupeIn=$('loupeIn');
+function updateLoupe(cl,label){
+  const N=G.puzzle.size,W=board.clientWidth,cs=W/N;
+  if(!drag||cs>=40){loupe.style.display='none';return}
+  dim.style.display='none';
+  const L=128,Z=Math.min(2.6,Math.max(1.8,46/cs)),cur=drag.cur;
+  const px=(cur.c+.5)*cs,py=(cur.r+.5)*cs;
+  loupeIn.className='board';
+  loupeIn.innerHTML=board.innerHTML.replace(/ id="[^"]*"/g,'');
+  loupeIn.style.cssText=board.style.cssText+`;inset:auto;left:0;top:0;width:${W}px;height:${W}px;transform-origin:0 0;transform:translate(${L/2-px*Z}px,${L/2-py*Z}px) scale(${Z})`;
+  const lc=$('loupeC');const cz=cs*Z-4;
+  lc.style.cssText=`left:${(L-cz)/2}px;top:${(L-cz)/2}px;width:${cz}px;height:${cz}px`;
+  const lb=$('loupeL');lb.textContent=label;lb.className='lbl'+cl;
+  let top=py-L-48,left=px-L/2;
+  if(wrap.getBoundingClientRect().top+top<6){top=py-L/2;left=px>W/2?px-L-48:px+48}
+  left=Math.max(-8,Math.min(W-L+8,left));
+  loupe.style.left=left+'px';loupe.style.top=top+'px';loupe.style.display='block';
 }
 let litTiles=[],doomedRects=[];
-function lightTiles(q,ok){
+function lightTiles(q,cl){
   clearLit();const N=G.puzzle.size,tiles=$('tileLayer').children;
-  for(let a=0;a<q.h;a++)for(let b=0;b<q.w;b++){const t=tiles[(q.r+a)*N+q.c+b];t.className='tile lit'+(ok?' ok':'');litTiles.push(t)}
+  for(let a=0;a<q.h;a++)for(let b=0;b<q.w;b++){const t=tiles[(q.r+a)*N+q.c+b];t.className='tile lit'+cl;litTiles.push(t)}
   G.rects.forEach((o,i)=>{if(overlaps(o,q)){const el=rectLayer.children[i];el.classList.add('doomed');doomedRects.push(el)}});
 }
 function clearLit(){litTiles.forEach(t=>t.className='tile');doomedRects.forEach(el=>el.classList.remove('doomed'));litTiles=[];doomedRects=[]}
-function hidePreview(){preview.style.display='none';dim.style.display='none';clearLit()}
+function hidePreview(){preview.style.display='none';dim.style.display='none';loupe.style.display='none';clearLit()}
 
 board.addEventListener('pointerdown',e=>{
   if(!G||G.solved||busy||drag)return;
@@ -547,7 +686,7 @@ board.addEventListener('pointerdown',e=>{
 board.addEventListener('pointermove',e=>{
   if(!drag||e.pointerId!==drag.id)return;
   e.preventDefault();
-  const cell=cellAt(e);
+  const cell=cellAt(e,drag.cur);
   if(cell.r===drag.cur.r&&cell.c===drag.cur.c)return;
   drag.cur=cell;
   if(cell.r!==drag.s.r||cell.c!==drag.s.c)drag.moved=true;
@@ -645,7 +784,9 @@ $('statsBtn').onclick=showStats;
 const PAL_INFO={pastel:['Pastel','Soft and light'],jewel:['Jewel','Rich and bold'],ocean:['Ocean','Mints, teals and blues']};
 function showColors(){
   const cur=store.get(K_PAL,'pastel');
-  showModal(`<h2>Board colors</h2><p class="muted" style="margin:0">Changes apply right away, even mid-puzzle.</p>
+  showModal(`<h2>Settings</h2>
+    <button class="setrow" id="mistRow"><span><b>Show mistakes</b><small>Amber outlines on wrong rectangles, and mint/amber while you drag</small></span><span class="tog${showMist?' on':''}" id="mistTog"></span></button>
+    <div class="sechd">Board colors</div>
     ${Object.keys(PALETTES).map(k=>`<button class="palopt${k===cur?' on':''}" data-pal="${k}"><span><b>${PAL_INFO[k][0]}</b><small>${PAL_INFO[k][1]}</small></span>
       <span class="sw">${PALETTES[k].slice(0,6).map(c=>`<i style="background:${c[0]}"></i>`).join('')}</span></button>`).join('')}
     <div class="btnrow"><button class="btn mint" data-close>Done</button></div>`);
@@ -653,7 +794,10 @@ function showColors(){
     store.set(K_PAL,b.dataset.pal);PAL=PALETTES[b.dataset.pal];if(G)render();
     document.querySelectorAll('.palopt').forEach(x=>x.classList.toggle('on',x===b));
   });
+  $('mistRow').onclick=()=>{showMist=!showMist;store.set(K_MIST,showMist);$('mistTog').classList.toggle('on',showMist);if(G)render()};
 }
+$('timeBtn').onclick=()=>setPaused(!paused);
+$('resumeBtn').onclick=()=>setPaused(false);
 $('palBtn').onclick=showColors;
 
 /* ---------- modal ---------- */
@@ -675,6 +819,11 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pagehide',()=>{pauseTimer();saveGame()});
 
+
+/* ---------- offline ---------- */
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})});
+}
 
 /* ---------- boot ---------- */
 renderModes();
