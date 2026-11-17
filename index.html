@@ -93,9 +93,9 @@ body.paused .controls .ctl:not(#newBtn){opacity:.35;pointer-events:none}
   box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -2px 0 rgba(0,0,0,.08),0 3px 10px rgba(0,0,0,.35)}
 .rect::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .2s;
   box-shadow:0 0 max(4px,calc(var(--cell)*.1)) var(--bg),0 0 max(11px,calc(var(--cell)*.28)) var(--bg),0 0 max(22px,calc(var(--cell)*.6)) color-mix(in srgb,var(--bg) 55%,transparent)}
-.board.neon .rect:not(.bad){box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--bg) 35%,#fff),inset 0 0 calc(var(--cell)*.22) color-mix(in srgb,var(--bg) 60%,#fff)}
-.board.neon .rect:not(.bad)::before{opacity:1}
-.board.neon.solved .rect::before{animation:neonpulse 2.6s ease-in-out 1s infinite}
+.board.neon.solved .rect:not(.bad){box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--bg) 35%,#fff),inset 0 0 calc(var(--cell)*.22) color-mix(in srgb,var(--bg) 60%,#fff)}
+.board.neon.solved .rect:not(.bad)::before{opacity:1}
+.board.neon.solved .rect::before{transition:opacity .9s ease .5s;animation:neonpulse 2.6s ease-in-out 2s infinite}
 @keyframes neonpulse{0%,100%{opacity:1}50%{opacity:.45}}
 .rect.bad{background:#2A2D33;box-shadow:inset 0 0 0 2.5px var(--amber)}
 .rect.hint::after{content:'';position:absolute;top:calc(var(--cell)*.12);right:calc(var(--cell)*.12);width:calc(var(--cell)*.13);height:calc(var(--cell)*.13);border-radius:50%;background:var(--fg);opacity:.45}
@@ -793,7 +793,7 @@ function showColors(){
   const cur=store.get(K_PAL,'pastel');
   showModal(`<h2>Settings</h2>
     <button class="setrow" id="mistRow"><span><b>Show mistakes</b><small>Amber outlines on wrong rectangles, and mint/amber while you drag</small></span><span class="tog${showMist?' on':''}" id="mistTog"></span></button>
-    <button class="setrow" id="neonRow"><span><b>Neon glow</b><small>A soft glow in each rectangle’s color</small></span><span class="tog${neon?' on':''}" id="neonTog"></span></button>
+    <button class="setrow" id="neonRow"><span><b>Neon glow on solve</b><small>Rectangles light up in neon when you finish a puzzle</small></span><span class="tog${neon?' on':''}" id="neonTog"></span></button>
     <div class="sechd">Board colors</div>
     ${Object.keys(PALETTES).map(k=>`<button class="palopt${k===cur?' on':''}" data-pal="${k}"><span><b>${PAL_INFO[k][0]}</b><small>${PAL_INFO[k][1]}</small></span>
       <span class="sw">${PALETTES[k].slice(0,6).map(c=>`<i style="background:${c[0]}"></i>`).join('')}</span></button>`).join('')}
